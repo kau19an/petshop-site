@@ -95,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     } else {
         // Se não houver erros, salva os dados no arquivo
-        $arquivo = 'usuarios.txt';
+        $arquivo = 'data/clientes.txt';
         $fp = fopen($arquivo, 'a');
 
         // Verifica se o arquivo foi aberto com sucesso

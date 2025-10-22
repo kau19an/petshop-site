@@ -25,106 +25,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UBC: Página de acesso</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #E7E7E7;
-            display: flex;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            flex-direction: column;
-        }
-        
-        #conteudo {
-            max-width: 700px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-        }
-
-        h1 {
-            color: #333;
-            margin: 5px 0;
-        }
-
-        
-        #tabela {
-            margin-top: 18px;
-            overflow-x: auto;
-        }
-
-        #tabela-pet {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 560px;
-            font-size: 14px;
-        }
-
-        #tabela-pet caption {
-            caption-side: top;
-            text-align: left;
-            font-weight: 600;
-            padding-bottom: 8px;
-            color: #444;
-        }
-
-        #tabela-pet th,
-        #tabela-pet td {
-            padding: 12px 14px;
-            border: 1px solid #e6e6e6;
-            text-align: left;
-        }
-
-        #tabela-pet thead th {
-            background: linear-gradient(180deg,#f7f9fb,#eef4fb);
-            color: #222;
-            font-weight: 700;
-        }
-
-        #tabela-pet tbody tr:nth-child(odd) {
-            background: #fbfcfd;
-        }
-
-        #tabela-pet tbody tr:hover {
-            background: #f1f8ff;
-        }
-
-        .servico {
-            color: #0b6efd;
-            font-weight: 600;
-        }
-
-        #btn-agendar {
-            padding: 8px 12px;
-            background-color: #5cb85c;
-            color: #fff;
-            border-radius: 5px;
-            border: none;
-            cursor: pointer;
-            margin-top: 12px;
-        }
-        #btn-agendar:hover {
-            background-color: #4cae4c;
-        }
-
-        #btn-sair {
-            padding: 8px 12px;
-            background-color: #d9534f;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 5px;
-            border: none;
-            cursor: pointer;
-            margin-top: 12px;
-            font-size: .9em;
-        }
-        #btn-sair:hover {
-            background-color: #c9302c;
-        }
-    </style>
+    <link rel="stylesheet" href="styles/home.css">
 </head>
 <body>
     <div id="conteudo">
@@ -142,7 +43,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
+                    <!-- <tr>
                         <td>Luna</td>
                         <td>Cão</td>
                         <td>3 anos</td>
@@ -159,14 +60,14 @@
                         <td>Cão</td>
                         <td>5 anos</td>
                         <td class="servico">Consulta odontológica (20/10 às 11:00)</td>
-                    </tr>
+                    </tr> -->
                 </tbody>
             </table>
         </div>
 
         <div style="display: flex; justify-content: space-between; align-items: center;">
-            <button id="btn-agendar" onClick="alert('Esse botão é somente de exemplo.')">Adicionar pet</button>
-            <a href="logica/sair.php" id="btn-sair">Sair</a>
+            <a href="adicionar_pet.php" id="btn-adicionar">Adicionar pet</a>
+            <a href="auth/sair.php" id="btn-sair">Sair</a>
         </div>
     </div>
 </body>
