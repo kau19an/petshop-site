@@ -35,7 +35,7 @@ bool usuarioExiste(const char *usuarioTemp);
 bool fazerLogin();
 bool criarUsuario();
 void adicionarPet();
-void listarPets();
+int listarPets();
 void atualizarPet();
 void removerPet();
 
@@ -312,13 +312,13 @@ void menuPetshop() {
 		printf("1) Adicionar pet\n");
 		printf("2) Listar pets\n");
 		printf("3) Atualizar pet*\n");
-		printf("4) Remover pet*\n");
+		printf("4) Remover pet\n");
 		printf("0) Sair da conta\n");
 		printf("> Escolha uma opção: ");
 
 		if (scanf("%d", &escolha) != 1) {
 			printf("\n(!) Entrada inválida. Tente novamente.\n");
-			printf("Pressione Enter para continuar...");
+			printf("\nPressione Enter para continuar...");
 			getchar();
 			continue;
 		}
@@ -330,6 +330,8 @@ void menuPetshop() {
 				break;
 			case 2:
 				listarPets();
+				printf("\nPressione Enter para continuar...");
+				getchar();
 				break;
 			case 3:
 				printf("\n(*) Em desenvolvimento...\n");
@@ -337,7 +339,7 @@ void menuPetshop() {
 				getchar();
 				break;
 			case 4:
-				printf("\n(*) Em desenvolvimento...\n");
+				removerPet();
 				printf("Pressione Enter para continuar...");
 				getchar();
 				break;
@@ -402,7 +404,7 @@ void adicionarPet() {
 	getchar();
 }
 
-void listarPets() {
+int listarPets() {
     char temp_user[MAX_USUARIO + 1];
     int i = 0;
     
@@ -420,7 +422,7 @@ void listarPets() {
 	if (fp == NULL) {
 		// Se o arquivo de pets não existir ainda, exibir:
 		printf("\n(!) Nenhum pet está cadastrado até o momento.\n");
-		printf("Pressione Enter para continuar...");
+		printf("\nPressione Enter para continuar...");
 		getchar();
 		return;
 	}
@@ -464,17 +466,107 @@ void listarPets() {
 	if (contador == 0) {
 		printf("(!) Nenhum pet foi encontrado para este usuário.\n");
 	}
-	
-	printf("\nPressione Enter para continuar...");
-	getchar();
+
+	return contador;
 }
 
 void atualizarPet() {
-	// criar aqui
+    printf("\n(*) Em desenvolvimento...\n");
+    printf("Pressione Enter para continuar...");
+    getchar();
 }
 
 void removerPet() {
-	// criar aqui
+    int id_remover;
+    int contador_pets = listarPets();
+    
+	if (contador_pets == 0) {
+        return; 
+    }
+    
+    printf("\n--- REMOVER PET ---\n");
+    printf("> Digite o ID do pet que deseja remover (0 para cancelar): ");
+    
+    if (scanf("%d", &id_remover) != 1) {
+        printf("\n(!) Entrada inválida.\n");
+        limparBuffer();
+        printf("Pressione Enter para continuar...");
+        getchar();
+        return;
+    }
+    limparBuffer();
+    
+    if (id_remover == 0) {
+        return;
+    }
+
+    FILE* fp_origem = fopen(ARQUIVO_PETS, "r");
+    if (fp_origem == NULL) {
+        printf("\n(!) Erro ao abrir o arquivo de pets.\n");
+        printf("Pressione Enter para continuar...");
+        getchar();
+        return;
+    }
+
+    FILE* fp_temp = fopen("../auth/data/temp_pets.txt", "w");
+    if (fp_temp == NULL) {
+        printf("\n(!) Erro ao criar arquivo temporário.\n");
+        fclose(fp_origem);
+        printf("Pressione Enter para continuar...");
+        getchar();
+        return;
+    }
+
+    char line[256];
+    char user_file[MAX_USUARIO + 1];
+    
+    bool pet_removido = false;
+    int id_atual = 0;
+    
+    while (fgets(line, sizeof(line), fp_origem)) {
+        // Tenta ler o nome do usuário para verificar
+        if (sscanf(line, "%10[^;]", user_file) == 1) {
+            
+            // Se a linha pertence ao usuário logado, incrementa o ID
+            if (strcmp(usuarioLogado, user_file) == 0) {
+                id_atual++;
+                
+                // Se o ID for o que queremos remover, pulamos a escrita
+                if (id_atual == id_remover) {
+                    pet_removido = true;
+                    continue; // Pula a linha, não a escreve no arquivo temporário
+                }
+            }
+        }
+        
+        // Escreve a linha no arquivo temporário se não for a linha a ser removida
+        fputs(line, fp_temp);
+    }
+
+    fclose(fp_origem);
+    fclose(fp_temp);
+
+	// Se o ID digitado for maior que o número de pets, é um erro
+    if (id_remover > contador_pets) {
+        printf("\n(!) ID inválido. Este usuário só tem %d pets.\n", contador_pets);
+        remove("../auth/data/temp_pets.txt"); 
+        printf("Pressione Enter para continuar...");
+        getchar();
+        return;
+    }
+
+    if (!pet_removido) {
+        printf("\n(!) Pet com ID %d não encontrado para o usuário logado.\n", id_remover);
+        remove("../auth/data/temp_pets.txt"); // Deleta o arquivo temporário
+    } else {
+        // Substitui o arquivo original pelo temporário
+        remove(ARQUIVO_PETS);
+        if (rename("../auth/data/temp_pets.txt", ARQUIVO_PETS) == 0) {
+            printf("\n(*) Pet com ID %d removido com sucesso!\n", id_remover);
+        } else {
+            printf("\n(!) Erro ao renomear o arquivo temporário.\n");
+        }
+    }
 }
 // Fim da área CRUD dos pets
 
@@ -513,7 +605,7 @@ int main() {
 				}
 				break;
 			case 2:
-				criarUsuario(); // Cria o usuário
+				criarUsuario();
 				break;
 			case 0:
 				printf("\nEncerrando...");
