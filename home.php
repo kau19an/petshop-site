@@ -1,6 +1,13 @@
 <?php
     session_start();
 
+    $erros = $_SESSION['erros'] ?? [];
+    $sucesso = $_SESSION['sucesso'] ?? null;
+
+    // Limpa as variáveis da sessão para que não apareçam novamente
+    unset($_SESSION['erros']);
+    unset($_SESSION['sucesso']);
+
     $erros = [];
 
     // Verifica se o usuário está logado
@@ -63,12 +70,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UBC: Página de acesso</title>
+    <link rel="stylesheet" href="styles/common.css">
     <link rel="stylesheet" href="styles/home.css">
 </head>
 <body>
     <div id="conteudo">
         <h1 style="display: flex; justify-content: center; align-items: center; gap: 3%;">Bem-vindo(a), <?= htmlspecialchars($nome) ?>!</h1>
         
+        <?php if (!empty($sucesso)): ?>
+            <div class="msg-sucesso">
+                <?= htmlspecialchars($sucesso) ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if (!empty($erros)): ?>
+            <div class="msg-erro">
+                <ul>
+                    <?php foreach ($erros as $erro): ?>
+                        <li><?= htmlspecialchars($erro) ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        <?php endif; ?>
+
         <div id="tabela">
             <table id="tabela-pet">
                 <caption>Seus pets e serviços agendados</caption>

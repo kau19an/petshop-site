@@ -101,7 +101,7 @@
                     
                     if ($acao === 'remover') {
                         $pet_modificado = true; 
-                        $_SESSION['sucesso'] = "\"{$nome_pet_acao}\" removido com sucesso!";
+                        $_SESSION['sucesso'] = "\"{$nome_pet_acao}\" foi removido com sucesso!";
                         continue; // Pula a linha, removendo-a
                     } 
                     
@@ -116,7 +116,7 @@
                         $new_lines[] = $new_line;
                         
                         $pet_modificado = true;
-                        $_SESSION['sucesso'] = "Serviço agendado ('{$servico}') para \"{$nome_pet_acao}\" com sucesso!";
+                        $_SESSION['sucesso'] = "\"{$servico}\" foi agendado com sucesso para \"{$nome_pet_acao}\".";
                         continue; // Pula o resto do loop e continua com a próxima linha
                     }
                 }
