@@ -15,6 +15,7 @@
 #define MAX_IDADE 15
 #define MAX_ESPECIE 15
 #define MAX_RACA 50
+#define MAX_SERVICO 50
 
 // Variáveis para o pet do cliente
 typedef struct {
@@ -22,6 +23,7 @@ typedef struct {
 	char idade[MAX_IDADE + 1];
 	char especie[MAX_ESPECIE + 1];
 	char raca[MAX_RACA + 1];
+	char servico[MAX_SERVICO + 1];
 } Pet;
 
 // Protótipos das funções para que o compilador as conheça
@@ -380,6 +382,9 @@ void adicionarPet() {
 	fgets(novoPet.raca, sizeof(novoPet.raca), stdin);
 	novoPet.raca[strcspn(novoPet.raca, "\n")] = '\0';
 
+	// Inicializa o campo "Serviço" vazio
+	strcpy(novoPet.servico, "Nenhum");
+
 	// Abre o arquivo de pets para adicionar
 	FILE* fp = fopen(ARQUIVO_PETS, "a");
 	if (fp == NULL) {
@@ -390,12 +395,13 @@ void adicionarPet() {
 	}
 
 	// Formato: usuarioLogado;nome_pet;idade;especie;raca\n
-	fprintf(fp, "%s;%s;%s;%s;%s\n",	
+	fprintf(fp, "%s;%s;%s;%s;%s;%s\n",	
 			usuarioLogado,	
 			novoPet.nome,
             novoPet.idade, 
 			novoPet.especie,	
-			novoPet.raca);
+			novoPet.raca,
+			novoPet.servico);
 			
 	fclose(fp);
 
@@ -434,31 +440,40 @@ int listarPets() {
     
 	while (fgets(line, sizeof(line), fp)) {
 		// Lê no formato: usuario;nome_pet;idade;especie;raca
-		if (sscanf(line, "%10[^;];%20[^;];%15[^;];%15[^;];%50[^\r\n]",	
+		int campos_lidos = sscanf(line, "%10[^;];%20[^;];%15[^;];%15[^;];%20[^;];%50[^\r\n]",	
 					user_file,	
 					pet_lido.nome,
 					pet_lido.idade,	
 					pet_lido.especie,	
-					pet_lido.raca) == 5) {	
+					pet_lido.raca,
+					pet_lido.servico);
 
-			// Checa se o pet pertence ao usuário logado
-			if (strcmp(usuarioLogado, user_file) == 0) {
-                if (contador == 0) {
-                    printf("\n%-2s | %-15s | %-5s | %-10s | %-10s\n",
-					        "ID", "Nome", "Idade", "Espécie", "Raça");
-					printf("-----------------------------------------------------------------\n");
-                }
-                
-				contador++;
-				printf("%-2d | %-15s | %-5s | %-10s | %-10s\n",	
-						contador,	
-						pet_lido.nome,
-						pet_lido.idade,	
-						pet_lido.especie,	
-						pet_lido.raca);
+			// Caso a linha tenha apenas 5 campos (pets sem agendamento)
+			if (campos_lidos == 5) {
+				strcpy(pet_lido.servico, "Nenhum");
+				campos_lidos = 6; // Trata como se tivesse 6 campos (com "Nenhum" no serviço)
+			}
+
+			if (campos_lidos >= 5) {
+				// Checa se o pet pertence ao usuário logado
+				if (strcmp(usuarioLogado, user_file) == 0) {
+					if (contador == 0) {
+						printf("\n%-2s | %-15s | %-5s | %-10s | %-10s | %-10s\n",
+								"ID", "Nome", "Idade", "Espécie", "Raça", "Serviço");
+						printf("-----------------------------------------------------------------\n");
+					}
+					
+					contador++;
+					printf("%-2d | %-15s | %-5s | %-10s | %-10s | %-10s\n",	
+							contador,	
+							pet_lido.nome,
+							pet_lido.idade,	
+							pet_lido.especie,	
+							pet_lido.raca,
+							pet_lido.servico);
+				}
 			}
 		}
-	}
 
 	fclose(fp);
 
