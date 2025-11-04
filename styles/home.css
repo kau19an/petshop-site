@@ -1,28 +1,32 @@
 body {
-    font-family: Arial, sans-serif;
+    background-image: none;
     background-color: #E7E7E7;
-    display: flex;
-    justify-content: center;
-    height: 100vh;
-    margin: 0;
-    flex-direction: column;
 }
 
 #conteudo {
     max-width: 700px;
     margin: 50px auto;
     padding: 20px;
-    background-color: #fff;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
 }
 
 h1 {
-    color: #333;
     margin: 5px 0;
 }
 
+/* Alerta */
+.msg-erro {
+    position: absolute;
+    top: 15px;
+    right: 0px;
+    border-radius: 15px 0 0 15px;
+    box-sizing: border-box;
+    z-index: 10;
+    margin-bottom: 0;
+}
 
+/* Tabela */
 #tabela {
     margin-top: 18px;
     overflow-x: auto;

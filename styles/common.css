@@ -1,0 +1,85 @@
+/* Estilos utilizados em todas as páginas */
+
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    flex-direction: column;
+    
+    background-image: url('../images/background.jpeg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: 15% 75%;
+}
+
+.conteudo {
+    background-color: #FFF;
+    padding: 30px;
+    border-radius: 4%;
+    box-shadow: 0 0 20px 8px rgb(0 0 0 / 10%);
+    width: 370px;
+    margin-left: 8%; /* Usado no login/cadastro */
+}
+
+h1 {
+    text-align: center;
+    margin: 0 0 10px 0;
+    color: #333;
+}
+h3 {
+    font-size: .9em;
+    text-align: center;
+    color: #555;
+}
+
+/* --- Mensagens de alerta --- */
+.msg-sucesso {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+.msg-erro {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    border-radius: 5px; /* Padrão do login.css */
+    margin-bottom: 20px;
+}
+.msg-erro ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+/* Formulários */
+.bloco-form {
+    margin-bottom: 15px;
+}
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+input[type] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* Botões usados no login ou cadastro */
+button {
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+button:hover {
+    background-color: #0056b3;
+}
