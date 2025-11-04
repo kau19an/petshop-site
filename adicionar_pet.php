@@ -24,7 +24,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UBC: Adicionar pet</title>
-    <link rel="stylesheet" href="styles/cadastro.css">
+    <link rel="stylesheet" href="styles/common.css">
     <style>
         .bloco-form {
             width: 100%;
