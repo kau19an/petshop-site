@@ -1,9 +1,5 @@
-body {
-    background-image: none;
-    background-color: #E7E7E7;
-}
-
 #conteudo {
+    background-color: #E7E7E7;
     max-width: 700px;
     margin: 50px auto;
     padding: 20px;
@@ -60,10 +56,13 @@ h1 {
     font-weight: 700;
 }
 
-#tabela-pet tbody tr:nth-child(odd) {
-    background: #fbfcfd;
+#tabela-pet td {
+    vertical-align: middle;
 }
 
+#tabela-pet tbody tr {
+    background: #fbfcfd;
+}
 #tabela-pet tbody tr:hover {
     background: #f1f8ff;
 }
@@ -71,6 +70,37 @@ h1 {
 .servico {
     color: #0b6efd;
     font-weight: 600;
+}
+
+/* Estilos para os botões */
+#btn-agendar-pet,
+#btn-remover-pet {
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    cursor: pointer;
+    border-radius: 3px;
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    text-decoration: none;
+    margin: 5px 0;
+    font-size: 0.85em;
+}
+
+#btn-agendar-pet {
+    background-color: #5cb85c;
+}
+#btn-agendar-pet:hover {
+    background-color: #4cae4c;
+}
+
+#btn-remover-pet {
+    background-color: #d9534f;
+}
+#btn-remover-pet:hover {
+    background-color: #c9302c;
 }
 
 #btn-adicionar {
@@ -100,4 +130,19 @@ h1 {
 }
 #btn-sair:hover {
     background-color: #c9302c;
+}
+
+#btn-atualizar {
+    padding: 8px 12px;
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    margin-top: 12px;
+    text-decoration: none;
+    font-size: .9em;
+}
+#btn-atualizar:hover {
+    background-color: #0056b3;
 }
