@@ -40,6 +40,7 @@ void adicionarPet();
 int listarPets();
 void atualizarPet();
 void removerPet();
+void agendarServico();
 
 // Para armazenar o nome de usuário atualmente logado
 char usuarioLogado[MAX_USUARIO + 1] = "";
@@ -313,8 +314,9 @@ void menuPetshop() {
 		printf("--- PETS DE %s ---\n", temp_user); 
 		printf("1) Adicionar pet\n");
 		printf("2) Listar pets\n");
-		printf("3) Atualizar pet*\n");
-		printf("4) Remover pet\n");
+		printf("3) Atualizar pet\n");
+		printf("4) Agendar serviço\n");
+		printf("5) Remover pet\n");
 		printf("0) Sair da conta\n");
 		printf("> Escolha uma opção: ");
 
@@ -336,13 +338,18 @@ void menuPetshop() {
 				getchar();
 				break;
 			case 3:
-				printf("\n(*) Em desenvolvimento...\n");
+				atualizarPet();
 				printf("Pressione Enter para continuar...");
 				getchar();
 				break;
 			case 4:
+				agendarServico();
+				printf("\nPressione Enter para continuar...");
+				getchar();
+				break;
+			case 5:
 				removerPet();
-				printf("Pressione Enter para continuar...");
+				printf("\nPressione Enter para continuar...");
 				getchar();
 				break;
 			case 0:
@@ -486,9 +493,136 @@ int listarPets() {
 }
 
 void atualizarPet() {
-    printf("\n(*) Em desenvolvimento...\n");
-    printf("Pressione Enter para continuar...");
-    getchar();
+    int id_pet;
+    Pet pet_novo_dados; // Estrutura para os novos dados
+    
+    int contador_pets = listarPets(); // Chama 'listarPets' para mostrar as opções e pegar a contagem
+    
+    // Se não tiver pets para listar, cancela
+	if (contador_pets == 0) {
+		printf("\n");
+        return;
+    }
+    
+    printf("\n--- ATUALIZAR PET ---\n");
+    printf("> Digite o ID do pet que deseja atualizar (0 para cancelar): ");
+    
+    if (scanf("%d", &id_pet) != 1) {
+        printf("\n(!) Entrada inválida.\n");
+        limparBuffer();
+        return;
+    }
+    limparBuffer();
+    
+    if (id_pet == 0) {
+        return;
+    }
+
+    if (id_pet < 1 || id_pet > contador_pets) {
+        printf("\n(!) ID de pet inválido.\n");
+        return;
+    }
+
+    // Armazena os novos dados do pet
+    limparTela();
+    printf("--- ATUALIZAR PET (ID %d) ---\n", id_pet);
+    
+    printf("> Nome do pet: ");
+	fgets(pet_novo_dados.nome, sizeof(pet_novo_dados.nome), stdin);
+	pet_novo_dados.nome[strcspn(pet_novo_dados.nome, "\n")] = '\0';
+
+    printf("> Idade (em anos): ");
+    fgets(pet_novo_dados.idade, sizeof(pet_novo_dados.idade), stdin);
+    pet_novo_dados.idade[strcspn(pet_novo_dados.idade, "\n")] = '\0';
+
+	printf("> Espécie: ");
+	fgets(pet_novo_dados.especie, sizeof(pet_novo_dados.especie), stdin);
+	pet_novo_dados.especie[strcspn(pet_novo_dados.especie, "\n")] = '\0';
+
+	printf("> Raça: ");
+	fgets(pet_novo_dados.raca, sizeof(pet_novo_dados.raca), stdin);
+	pet_novo_dados.raca[strcspn(pet_novo_dados.raca, "\n")] = '\0';
+
+
+    // Abertura e reescrita do arquivo
+    FILE* fp_origem = fopen(ARQUIVO_PETS, "r");
+    if (fp_origem == NULL) {
+        printf("\n(!) Erro ao abrir o arquivo de pets.\n");
+        return;
+    }
+
+    FILE* fp_temp = fopen("../auth/data/temp_pets.txt", "w");
+    if (fp_temp == NULL) {
+        printf("\n(!) Erro ao criar arquivo temporário.\n");
+        fclose(fp_origem);
+        return;
+    }
+
+    char line[256];
+    char user_file[MAX_USUARIO + 1];
+    Pet pet_antigo_dados; // Estrutura para ler dados antigos
+    
+    bool pet_modificado = false;
+    int id_atual = 0;
+    
+    // Processa o arquivo linha por linha
+    while (fgets(line, sizeof(line), fp_origem)) {
+        
+        // Tenta ler 6 campos da linha
+        int campos_lidos = sscanf(line, "%10[^;];%20[^;];%15[^;];%15[^;];%50[^;];%50[^\r\n]",	
+					user_file,	
+					pet_antigo_dados.nome,
+					pet_antigo_dados.idade,	
+					pet_antigo_dados.especie,	
+					pet_antigo_dados.raca,
+					pet_antigo_dados.servico);
+					
+		// Se a linha não tiver 6 campos, reescreve ela como estava
+		if (campos_lidos < 5) {
+			fputs(line, fp_temp);
+			continue;
+		}
+
+        // Se a linha pertence ao usuário logado, incrementa o ID
+        if (strcmp(usuarioLogado, user_file) == 0) {
+            id_atual++;
+            
+            // Se o ID for o pet que queremos atualizar:
+            if (id_atual == id_pet) {
+                
+                // Reescreve a linha com os novos dados
+                fprintf(fp_temp, "%s;%s;%s;%s;%s;%s\n",	
+                        usuarioLogado,	
+                        pet_novo_dados.nome,
+                        pet_novo_dados.idade,
+                        pet_novo_dados.especie,
+                        pet_novo_dados.raca,
+                        pet_antigo_dados.servico); // Mantém o serviço original
+                        
+                pet_modificado = true;
+                continue; // Pula a escrita da linha original
+            }
+        }
+        
+        // Se a linha não foi modificada, escreve a linha original
+        fputs(line, fp_temp);
+    }
+
+    fclose(fp_origem);
+    fclose(fp_temp);
+
+    // Substituição de arquivo
+    if (pet_modificado) {
+        remove(ARQUIVO_PETS);
+        if (rename("../auth/data/temp_pets.txt", ARQUIVO_PETS) == 0) {
+            printf("\n(*) \"%s\" (ID %d) atualizado com sucesso.\n", pet_novo_dados.nome, id_pet);
+        } else {
+            printf("\n(!) Erro ao renomear o arquivo temporário.\n");
+        }
+    } else {
+        printf("\n(!) Erro: Pet com ID %d não foi encontrado ou modificado.\n", id_pet);
+        remove("../auth/data/temp_pets.txt");
+    }
 }
 
 void removerPet() {
@@ -585,6 +719,116 @@ void removerPet() {
 }
 // Fim da área CRUD dos pets
 
+void agendarServico() {
+    int id_pet;
+    int contador_pets = listarPets(); // Chama 'listarPets' para mostrar as opções e pegar a contagem
+    
+    // Se não tiver pets para listar, cancela
+	if (contador_pets == 0) {
+		printf("\n");
+        return;
+    }
+    
+    printf("\n--- AGENDAR SERVIÇO ---\n");
+    printf("> Digite o ID do pet (0 para cancelar): ");
+    
+    if (scanf("%d", &id_pet) != 1) {
+        printf("\n(!) Entrada inválida.\n");
+        limparBuffer();
+        return;
+    }
+    limparBuffer();
+    
+    if (id_pet == 0) {
+        return;
+    }
+
+    if (id_pet < 1 || id_pet > contador_pets) {
+        printf("\n(!) ID de pet inválido.\n");
+        return;
+    }
+
+    char novo_servico[MAX_SERVICO + 1];
+    printf("> Nome do serviço a ser agendado: ");
+    fgets(novo_servico, sizeof(novo_servico), stdin);
+    novo_servico[strcspn(novo_servico, "\n")] = '\0'; // Remove o \n
+
+    // Abre o arquivo original para leitura
+    FILE* fp_origem = fopen(ARQUIVO_PETS, "r");
+    if (fp_origem == NULL) {
+        printf("\n(!) Erro ao abrir o arquivo de pets.\n");
+        return;
+    }
+
+    // Abre o arquivo temporário para escrita
+    FILE* fp_temp = fopen("../auth/data/temp_pets.txt", "w");
+    if (fp_temp == NULL) {
+        printf("\n(!) Erro ao criar arquivo temporário.\n");
+        fclose(fp_origem);
+        return;
+    }
+
+    char line[256];
+    char user_file[MAX_USUARIO + 1];
+    Pet pet_lido;
+    
+    bool pet_modificado = false;
+    int id_atual = 0;
+    
+    // Processa o arquivo linha por linha
+    while (fgets(line, sizeof(line), fp_origem)) {
+        
+        // Tenta ler 6 campos da linha
+        int campos_lidos = sscanf(line, "%10[^;];%20[^;];%15[^;];%15[^;];%50[^;];%50[^\r\n]",	
+					user_file,	
+					pet_lido.nome,
+					pet_lido.idade,	
+					pet_lido.especie,	
+					pet_lido.raca,
+					pet_lido.servico);
+
+        // Se a linha pertence ao usuário logado, incrementa o ID
+        if (strcmp(usuarioLogado, user_file) == 0) {
+            id_atual++;
+            
+            // Se o ID for o pet que queremos agendar, modificamos a linha
+            if (id_atual == id_pet) {
+                
+                // Reescreve a linha no formato de 6 campos, substituindo o serviço
+                fprintf(fp_temp, "%s;%s;%s;%s;%s;%s\r\n",	
+                        usuarioLogado,	
+                        pet_lido.nome,
+                        pet_lido.idade, 
+                        pet_lido.especie,	
+                        pet_lido.raca,
+                        novo_servico);
+                        
+                pet_modificado = true;
+                continue; // Pula a escrita da linha original
+            }
+        }
+        
+        // Se a linha não for a que foi modificada, escreve a linha original
+        fputs(line, fp_temp);
+    }
+
+    fclose(fp_origem);
+    fclose(fp_temp);
+
+    // Substituição de arquivo
+    if (pet_modificado) {
+        remove(ARQUIVO_PETS);
+        if (rename("../auth/data/temp_pets.txt", ARQUIVO_PETS) == 0) {
+            printf("\n(*) \"%s\" agendado com sucesso para \"%s\".\n", novo_servico, pet_lido.nome);
+        } else {
+            printf("\n(!) Erro ao renomear o arquivo temporário.\n");
+        }
+    } else {
+        printf("\n(!) Erro: Pet com ID %d não foi encontrado ou modificado.\n", id_pet);
+        remove("../auth/data/temp_pets.txt");
+    }
+}
+
 int main() {
 	int escolha;
 	bool logado = false;
@@ -594,7 +838,7 @@ int main() {
 	// Loop principal do menu
 	while(true) {
 		limparTela(); // Limpa a tela a cada iteração do menu
-		printf("-- MENU PETSHOP --\n");
+		printf("--- MENU PETSHOP ---\n");
 		printf("1) Fazer login\n");
 		printf("2) Criar conta\n");
 		printf("0) Sair\n");
