@@ -118,12 +118,11 @@
                             <td><?= htmlspecialchars($pet['idade']) ?> anos</td>
                             <td><?= htmlspecialchars($pet['raca']) ?></td>
                             <td style="text-align: center;">
-                                <button type="button" 
-                                onclick="agendarServico(<?= $pet['id_pet'] ?>)"
-                                style="background-color: #4CAF50; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 3px; margin-bottom: 5px;">
+                                <button type="button" id="btn-agendar-pet"
+                                onclick="agendarServico(<?= $pet['id_pet'] ?>)">
                                 Agendar
-                                </button><br>
-                                <a href="auth/pet.php?acao=remover&id=<?= $pet['id_pet'] ?>" onclick="return confirm('Tem certeza que deseja remover o pet &quot;<?= htmlspecialchars($pet['nome']) ?>&quot;?');" style="background-color: #f44336; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 3px; display: inline-block; text-decoration: none;">
+                                </button>
+                                <a href="auth/pet.php?acao=remover&id=<?= $pet['id_pet'] ?>" onclick="return confirm('Tem certeza que deseja remover o pet &quot;<?= htmlspecialchars($pet['nome']) ?>&quot;?');" id="btn-remover-pet">
                                 Remover
                                 </a>
                             </td>
@@ -136,24 +135,41 @@
         </div>
 
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
-            <a href="adicionar_pet.php" id="btn-adicionar">Adicionar pet</a>
+            <div>
+                <a href="adicionar_pet.php" id="btn-adicionar">Adicionar pet</a>
+                <?php if (!empty($pets_do_usuario)): ?>
+                    <button type="button" onclick="atualizarPet()" id="btn-atualizar">Atualizar pet</button>
+                <?php endif; ?>
+            </div>
             <a href="auth/sair.php" id="btn-sair">Sair</a>
         </div>
     </div>
 
     <script>
-    function agendarServico(petId) {
-        // Pede ao usuário para digitar o serviço
-        var servico = prompt("Digite o serviço a ser agendado:");
+        function agendarServico(petId) {
+            // Pede ao usuário para digitar o serviço
+            var servico = prompt("Digite o serviço a ser agendado:");
 
-        // Checa se o usuário digitou algo e não cancelou
-        if (servico !== null && servico.trim() !== "") {
-            // Redireciona para o script PHP de processamento (auth/pet.php) com a ação 'agendar', o ID do pet e o serviço
-            window.location.href = 'auth/pet.php?acao=agendar&id=' + petId + '&servico=' + encodeURIComponent(servico.trim());
-        } else if (servico !== null) {
-            alert("O serviço não pode estar vazio.");
+            // Checa se o usuário digitou algo e não cancelou
+            if (servico !== null && servico.trim() !== "") {
+                // Redireciona para o script PHP de processamento (auth/pet.php) com a ação 'agendar', o ID do pet e o serviço
+                window.location.href = 'auth/pet.php?acao=agendar&id=' + petId + '&servico=' + encodeURIComponent(servico.trim());
+            } else if (servico !== null) {
+                alert("O serviço não pode estar vazio.");
+            }
         }
-    }
-</script>
+
+        function atualizarPet() {
+            var nomePet = prompt("Digite o nome exato do pet que deseja atualizar:");
+
+            // Checa se o usuário digitou algo e não cancelou
+            if (nomePet !== null && nomePet.trim() !== "") {
+                // Redireciona para o novo formulário de atualização
+                window.location.href = 'atualizar_pet.php?nome=' + encodeURIComponent(nomePet.trim());
+            } else if (nomePet !== null) {
+                alert("O nome do pet não pode estar vazio.");
+            }
+        }
+    </script>
 </body>
 </html>

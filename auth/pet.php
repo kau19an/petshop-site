@@ -52,14 +52,88 @@
             }
 
             // Formato: usuarioLogado;nome_pet;idade;especie;raca\n
-            $linha = sprintf("%s;%s;%s;%s;%s\n", 
-                            $usuario_logado, $nome_pet, $idade, $especie, $raca);
+            $linha = sprintf("%s;%s;%s;%s;%s;%s\r\n", 
+                            $usuario_logado, $nome_pet, $idade, $especie, $raca, "Nenhum");
                             
             fwrite($fp, $linha);
             fclose($fp);
 
             $_SESSION['sucesso'] = "\"{$nome_pet}\" foi adicionado com sucesso!";
             header('Location: ../adicionar_pet.php'); 
+            exit;
+        } else if ($acao === 'atualizar') {
+            $nome_original = $_POST['nome_original'] ?? '';
+            $servico_original = $_POST['servico_original'] ?? 'Nenhum'; // Mantém o serviço
+            
+            $nome_pet_temp  = $_POST['nome'] ?? '';
+            $idade_temp     = $_POST['idade'] ?? '';
+            $especie_temp   = $_POST['especie'] ?? '';
+            $raca_temp      = $_POST['raca'] ?? '';
+
+            // Remove os espaços em branco e valida
+            $nome_pet = trim($nome_pet_temp);
+            $idade    = trim($idade_temp);
+            $especie  = trim($especie_temp);
+            $raca     = trim($raca_temp);
+            
+            if (empty($nome_original)) { $erros[] = "O nome original do pet não foi fornecido."; }
+            if (empty($nome_pet)) { $erros[] = "O novo nome do pet é obrigatório."; }
+            if (empty($idade) || !is_numeric($idade) || (int)$idade < 0) { $erros[] = "A idade deve ser um número inteiro positivo."; }
+            if (empty($especie)) { $erros[] = "A espécie do pet é obrigatória."; }
+
+            if (!empty($erros)) {
+                $_SESSION['erros'] = $erros;
+                header('Location: ../home.php'); // Redireciona para 'home' em caso de erro
+                exit;
+            }
+
+            // Reescrita do arquivo
+            $lines = file($caminho_arquivo, FILE_IGNORE_NEW_LINES);
+            $new_lines = [];
+            $pet_modificado = false;
+            
+            $nova_linha = sprintf("%s;%s;%s;%s;%s;%s", 
+                                  $usuario_logado, $nome_pet, $idade, $especie, $raca, $servico_original);
+            
+            foreach ($lines as $line) {
+                $data = explode(';', $line);
+                
+                // Verifica se a linha tem o mínimo de campos (5) e pertence ao usuário logado
+                if (count($data) >= 5 && trim($data[0]) === $usuario_logado) {
+                    
+                    // Se for a linha que queremos modificar
+                    if (trim($data[1]) === $nome_original) {
+                        
+                        // Garante que o pet não está sendo usado como ID para outro pet
+                        if ($pet_modificado) {
+                            $erros[] = "Há mais de um pet com o mesmo nome original. Apenas o primeiro foi atualizado.";
+                            $_SESSION['erros'] = $erros;
+                            break; // Sai do loop para reescrever
+                        }
+                        
+                        $new_lines[] = $nova_linha; // Substitui pela nova linha
+                        $pet_modificado = true; 
+                        continue; // Pula a linha original
+                    }
+                }
+                
+                // Mantém a linha inalterada
+                $new_lines[] = $line;
+            }
+
+            // Reescreve o arquivo
+            if ($pet_modificado) {
+                $content = implode(PHP_EOL, $new_lines);
+                if (!empty($new_lines)) {
+                    $content .= PHP_EOL;
+                }
+                file_put_contents($caminho_arquivo, $content);
+                $_SESSION['sucesso'] = "\"{$nome_original}\" foi atualizado com sucesso.";
+            } else {
+                $_SESSION['erros'][] = "\"{$nome_original}\" não foi encontrado para atualização.";
+            }
+
+            header('Location: ../home.php'); 
             exit;
         }
     }
@@ -129,7 +203,11 @@
         // Reescreve o arquivo se houve alguma modificação
         if ($pet_modificado) {
             // 'file_put_contents' sobrescreve o arquivo e implode com quebra de linha
-            file_put_contents($caminho_arquivo, implode(PHP_EOL, $new_lines));
+            $content = implode(PHP_EOL, $new_lines);
+            if (!empty($new_lines)) {
+                $content .= PHP_EOL;
+            }
+            file_put_contents($caminho_arquivo, $content);
         } else {
             // Se a ação era agendar ou remover, mas 'pet_modificado' é falso, o ID estava fora do range
             if (!isset($_SESSION['sucesso'])) {
